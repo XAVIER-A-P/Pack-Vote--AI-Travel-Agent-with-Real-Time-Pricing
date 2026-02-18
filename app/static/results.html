@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Pack Vote</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-6">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Live Election Results</h2>
+        
+        <canvas id="resultsChart"></canvas>
+        
+        <div id="status" class="mt-4 text-center text-slate-500 animate-pulse">
+            Polling for new votes...
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('resultsChart');
+        const tripId = window.location.pathname.split('/').pop();
+
+        // 1. Initialize Empty Chart
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Votes',
+                    data: [],
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+
+        // 2. Poll Logic
+        async function fetchResults() {
+            try {
+                const res = await fetch(`/trips/${tripId}/calculate`);
+                const data = await res.json();
+                
+                // Assuming backend returns: { winner: "Paris", rounds: [{"Paris": 5, "Tokyo": 2}] }
+                // We display the LAST round of voting
+                const lastRound = data.rounds[data.rounds.length - 1];
+                
+                // Update Chart Data
+                chart.data.labels = Object.keys(lastRound);
+                chart.data.datasets[0].data = Object.values(lastRound);
+                chart.update();
+
+                if (data.winner) {
+                    document.getElementById('status').innerText = `🎉 Winner: ${data.winner}!`;
+                    document.getElementById('status').classList.remove('animate-pulse');
+                    document.getElementById('status').classList.add('text-green-600', 'font-bold', 'text-xl');
+                }
+            } catch (e) {
+                console.error("Polling error", e);
+            }
+        }
+
+        // Poll every 2 seconds
+        setInterval(fetchResults, 2000);
+        fetchResults(); // Initial call
+    </script>
+</body>
+</html>

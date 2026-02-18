@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote - Pack Vote</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-6">
+    <div class="max-w-md mx-auto">
+        <h2 class="text-2xl font-bold mb-4 text-slate-800">Rank Your Choices</h2>
+        <p class="text-sm text-slate-500 mb-6">Drag your favorite destination to the top.</p>
+
+        <div id="ballot" class="space-y-3">
+            </div>
+
+        <button onclick="submitVote()" class="w-full mt-8 bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-green-700 transition">
+            Submit Ballot
+        </button>
+    </div>
+
+    <script>
+        // Mock Data - In production, fetch this from /api/trips/{id}
+        const candidates = [
+            {id: 'PAR', name: 'Paris, France ($650)'},
+            {id: 'TOK', name: 'Tokyo, Japan ($820)'},
+            {id: 'CUN', name: 'Cancun, Mexico ($450)'}
+        ];
+
+        const ballotEl = document.getElementById('ballot');
+
+        // 1. Render List
+        candidates.forEach(c => {
+            const item = document.createElement('div');
+            item.className = "p-4 bg-white rounded-lg shadow border border-slate-200 cursor-move flex items-center justify-between group hover:border-blue-400";
+            item.setAttribute('data-id', c.id);
+            item.innerHTML = `
+                <span class="font-medium text-slate-700">${c.name}</span>
+                <span class="text-slate-300 group-hover:text-blue-400">☰</span>
+            `;
+            ballotEl.appendChild(item);
+        });
+
+        // 2. Initialize SortableJS
+        new Sortable(ballotEl, {
+            animation: 150,
+            ghostClass: 'bg-blue-50'
+        });
+
+        // 3. Submit Logic
+        async function submitVote() {
+            // Get order from DOM
+            const order = Array.from(ballotEl.children).map(el => el.getAttribute('data-id'));
+            
+            // Get trip_id from URL: /vote/{trip_id}
+            const tripId = window.location.pathname.split('/').pop();
+
+            await fetch(`/trips/${tripId}/vote`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ ranked_preferences: order })
+            });
+
+            // Redirect to Results
+            window.location.href = `/results/${tripId}`;
+        }
+    </script>
+</body>
+</html>

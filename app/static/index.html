@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pack Vote - AI Travel Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">Pack Vote ✈️</h1>
+        <p class="text-slate-500 mb-6">Agentic AI Travel Planning</p>
+
+        <form id="createTripForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Origin City</label>
+                <input type="text" id="origin" value="JFK" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border" required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Trip Vibe</label>
+                <textarea id="vibe" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border" placeholder="e.g. A chill beach trip in May 2026 under $800"></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center items-center">
+                <span>Ask AI Agent</span>
+            </button>
+        </form>
+
+        <div id="loading" class="hidden mt-4 text-center text-blue-600 animate-pulse">
+            Thinking... (Checking Flight APIs)
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('createTripForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loading');
+            
+            // UI Feedback
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            loader.classList.remove('hidden');
+
+            const payload = {
+                origin: document.getElementById('origin').value,
+                vibe: document.getElementById('vibe').value
+            };
+
+            try {
+                // Call your existing FastAPI endpoint
+                const res = await fetch('/trips/create', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                
+                // Redirect to the Voting Page
+                window.location.href = `/vote/${data.trip_id}`;
+            } catch (error) {
+                alert("Error calling AI Agent: " + error);
+                btn.disabled = false;
+                loader.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+name: Production Build
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with: { python-version: '3.10' }
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Integration Tests
+        run: pytest tests/ # Ensures AI Gateway doesn't crash
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t my-registry/pack-vote:latest .
+          docker push my-registry/pack-vote:latest
+      # Add step here to deploy to AWS App Runner / GCP Cloud Run
