@@ -55,18 +55,17 @@ graph TD
 
 ### Frontend
 
-* **Framework:** Next.js 14 (App Router)
-* **Language:** TypeScript
-* **State:** TanStack Query (React Query)
-* **Visualization:** Recharts, Framer Motion
-* **Styling:** Tailwind CSS + shadcn/ui
+* **Framework:** Vanilla HTML5
+* **Language:** Vanilla JavaScript (ES6+)
+* **State Management:** Native DOM & JS Variables
+* **Visualization:** Chart.js, SortableJS
+* **Styling:** Tailwind CSS (via CDN)
 
 ## ⚡ Getting Started
 
 ### Prerequisites
 
 * Docker & Docker Compose
-* Node.js 18+
 * API Keys: OpenAI, Anthropic, Amadeus, Twilio (Optional)
 
 ### 1. Clone & Setup
