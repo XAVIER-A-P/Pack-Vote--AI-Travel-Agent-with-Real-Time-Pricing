@@ -103,16 +103,6 @@ docker-compose up --build
 
 ```
 
-### 4. Run Frontend (Local)
-
-```bash
-cd web
-npm install
-npm run dev
-# Open http://localhost:3000
-
-```
-
 ## 🧪 Engineering Challenges & Solutions
 
 ### Challenge: LLM Hallucination
