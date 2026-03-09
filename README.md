@@ -71,7 +71,7 @@ graph TD
 ### 1. Clone & Setup
 
 ```bash
-git clone https://github.com/yourusername/pack-vote.git
+git clone <your-repo-url>
 cd pack-vote
 
 ```
